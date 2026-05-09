@@ -41,6 +41,23 @@ The current domain model contains the core entities for processing an auto parts
 
 For the MVP, these domain classes are also JPA entities so they can be stored in PostgreSQL.
 
+## PostgreSQL Persistence
+
+Spring Data JPA repositories are placed in the `infrastructure` package:
+
+- `RequestCaseRepository` for saving and loading request cases
+- `CustomerRepository` for customer records
+- `VehicleRepository` for vehicle records
+
+`RequestCaseRepository` extends `JpaRepository`, so it already supports common persistence operations such as `findAll`, `findById`, and `save`.
+
+A simple development data loader creates one sample request when the database has no request cases yet. The sample request contains:
+
+- Customer: `polrig`
+- Vehicle: `SEAT ALHAMBRA 2007`
+- VIN: `VSSZZZ7MZ8V505695`
+- Requested parts: `front brake discs`, `front brake pads`, `rear springs`
+
 ## Start PostgreSQL
 
 Start the PostgreSQL container:
