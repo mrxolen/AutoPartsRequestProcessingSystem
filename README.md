@@ -26,7 +26,20 @@ The project uses a simple layered package structure:
 - `infrastructure` - database and external integrations
 - `web` - controllers and web layer
 
-Domain models, services, UI, and business workflows will be added in later stages.
+Services, UI, and business workflows will be added in later stages.
+
+## Domain Model
+
+The current domain model contains the core entities for processing an auto parts request:
+
+- `Customer` with a `CustomerType`
+- `Vehicle`
+- `RequestCase` with a `RequestStatus`, created date, customer, vehicle, requested parts, and supplier offers
+- `RequestedPart` for parts the customer needs
+- `SupplierOffer` for supplier prices and part details
+- `Money` as an embeddable value object for purchase and selling prices
+
+For the MVP, these domain classes are also JPA entities so they can be stored in PostgreSQL.
 
 ## Start PostgreSQL
 
