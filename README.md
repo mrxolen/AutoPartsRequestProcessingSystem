@@ -58,6 +58,25 @@ A simple development data loader creates one sample request when the database ha
 - VIN: `VSSZZZ7MZ8V505695`
 - Requested parts: `front brake discs`, `front brake pads`, `rear springs`
 
+## Pricing Calculation
+
+Pricing calculation is implemented in the `application` package using the Strategy pattern.
+
+Each customer type has its own pricing strategy:
+
+- `WalkInPricingStrategy` adds a fixed markup of `15.00 EUR` per item
+- `RegularPricingStrategy` adds `25%`
+- `VipPricingStrategy` adds `15%`
+
+`PricingStrategyResolver` chooses the correct strategy for the customer type, and `PricingService` uses it to calculate:
+
+- selling price per item
+- total purchase price
+- total selling price
+- profit
+
+This keeps pricing rules separate and avoids putting all customer type logic into one large conditional block.
+
 ## Start PostgreSQL
 
 Start the PostgreSQL container:
