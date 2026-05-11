@@ -1,0 +1,19 @@
+package com.autoparts.application;
+
+import com.autoparts.domain.RequestStatus;
+import java.util.Set;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SearchingState implements RequestState {
+
+    @Override
+    public RequestStatus getStatus() {
+        return RequestStatus.SEARCHING;
+    }
+
+    @Override
+    public Set<RequestStatus> getAllowedNextStatuses() {
+        return Set.of(RequestStatus.OFFER_READY);
+    }
+}

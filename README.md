@@ -77,6 +77,33 @@ Each customer type has its own pricing strategy:
 
 This keeps pricing rules separate and avoids putting all customer type logic into one large conditional block.
 
+## Request Status Workflow
+
+Request status changes are implemented in the `application` package using the State pattern.
+
+Each request status has its own state class:
+
+- `NewState`
+- `SearchingState`
+- `OfferReadyState`
+- `SentToClientState`
+- `AcceptedState`
+- `RejectedState`
+- `CompletedState`
+
+Each state defines which statuses can come next. `StatusTransitionService` finds the current state for a `RequestCase` and asks it to apply the transition. Invalid transitions throw `InvalidStatusTransitionException`.
+
+Valid transitions:
+
+- `NEW` -> `SEARCHING`
+- `SEARCHING` -> `OFFER_READY`
+- `OFFER_READY` -> `SENT_TO_CLIENT`
+- `SENT_TO_CLIENT` -> `ACCEPTED`
+- `SENT_TO_CLIENT` -> `REJECTED`
+- `ACCEPTED` -> `COMPLETED`
+
+This keeps workflow rules close to each status and avoids one large conditional block.
+
 ## Start PostgreSQL
 
 Start the PostgreSQL container:
