@@ -26,7 +26,7 @@ The project uses a simple layered package structure:
 - `infrastructure` - database and external integrations
 - `web` - controllers and web layer
 
-Services, UI, and business workflows will be added in later stages.
+UI and additional business workflows will be added in later stages.
 
 ## Domain Model
 
@@ -103,6 +103,35 @@ Valid transitions:
 - `ACCEPTED` -> `COMPLETED`
 
 This keeps workflow rules close to each status and avoids one large conditional block.
+
+## Application Service Layer
+
+The `application` package contains `RequestService`, which coordinates request use cases:
+
+- create a request
+- get all requests
+- get a request by id
+- add a requested part
+- add a supplier offer
+- calculate supplier offer selling price through `PricingService`
+- change request status through `StatusTransitionService`
+- save changes through `RequestCaseRepository`
+
+Small command DTOs are used as input objects:
+
+- `CreateRequestCommand`
+- `AddRequestedPartCommand`
+- `AddSupplierOfferCommand`
+
+## Request Factory
+
+`RequestCaseFactory` uses the Factory pattern to create new `RequestCase` objects. It receives a `CreateRequestCommand`, checks the `CustomerType`, and creates the correct request setup for:
+
+- `WALK_IN`
+- `REGULAR`
+- `VIP`
+
+The factory keeps request construction in one place, while `RequestService` stays focused on coordinating persistence, pricing, and status changes.
 
 ## Start PostgreSQL
 
