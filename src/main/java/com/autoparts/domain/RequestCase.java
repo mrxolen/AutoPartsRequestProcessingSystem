@@ -52,6 +52,9 @@ public class RequestCase {
     @OneToMany(mappedBy = "requestCase", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SupplierOffer> supplierOffers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "requestCase", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StatusHistoryEntry> statusHistory = new ArrayList<>();
+
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdDate;
 

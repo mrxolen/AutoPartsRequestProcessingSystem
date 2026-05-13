@@ -37,6 +37,7 @@ The current domain model contains the core entities for processing an auto parts
 - `RequestCase` with a `RequestStatus`, created date, customer, vehicle, requested parts, and supplier offers
 - `RequestedPart` for parts the customer needs
 - `SupplierOffer` for supplier prices and part details
+- `StatusHistoryEntry` for status change history
 - `Money` as an embeddable value object for purchase and selling prices
 
 For the MVP, these domain classes are also JPA entities so they can be stored in PostgreSQL.
@@ -132,6 +133,23 @@ Small command DTOs are used as input objects:
 - `VIP`
 
 The factory keeps request construction in one place, while `RequestService` stays focused on coordinating persistence, pricing, and status changes.
+
+## Status Change Observers
+
+Request status changes use a simple Observer pattern.
+
+`RequestService` changes the status through `StatusTransitionService`. After a successful transition, it notifies all `RequestStatusObserver` implementations:
+
+- `StatusHistoryObserver` adds a `StatusHistoryEntry` to the request
+- `ConsoleNotificationObserver` writes a simple log message
+
+Each history entry stores:
+
+- old status
+- new status
+- change date
+
+This keeps status change side effects separate from the transition validation logic.
 
 ## Start PostgreSQL
 

@@ -28,6 +28,7 @@ class RequestServiceTest {
     private RequestCaseRepository requestCaseRepository;
     private CustomerRepository customerRepository;
     private VehicleRepository vehicleRepository;
+    private RequestStatusObserver notificationObserver;
     private RequestService requestService;
 
     @BeforeEach
@@ -35,6 +36,7 @@ class RequestServiceTest {
         requestCaseRepository = mock(RequestCaseRepository.class);
         customerRepository = mock(CustomerRepository.class);
         vehicleRepository = mock(VehicleRepository.class);
+        notificationObserver = mock(RequestStatusObserver.class);
 
         PricingService pricingService = new PricingService(new PricingStrategyResolver(List.of(
                 new WalkInPricingStrategy(),
@@ -58,7 +60,8 @@ class RequestServiceTest {
                 vehicleRepository,
                 new RequestCaseFactory(),
                 pricingService,
-                statusTransitionService
+                statusTransitionService,
+                List.of(new StatusHistoryObserver(), notificationObserver)
         );
 
         when(customerRepository.save(any(Customer.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -141,6 +144,11 @@ class RequestServiceTest {
         RequestCase savedRequest = requestService.changeRequestStatus(1L, RequestStatus.SEARCHING);
 
         assertThat(savedRequest.getStatus()).isEqualTo(RequestStatus.SEARCHING);
+        assertThat(savedRequest.getStatusHistory()).hasSize(1);
+        assertThat(savedRequest.getStatusHistory().getFirst().getOldStatus()).isEqualTo(RequestStatus.NEW);
+        assertThat(savedRequest.getStatusHistory().getFirst().getNewStatus()).isEqualTo(RequestStatus.SEARCHING);
+        assertThat(savedRequest.getStatusHistory().getFirst().getChangedDate()).isNotNull();
+        verify(notificationObserver).onStatusChanged(requestCase, RequestStatus.NEW, RequestStatus.SEARCHING);
         verify(requestCaseRepository).save(requestCase);
     }
 

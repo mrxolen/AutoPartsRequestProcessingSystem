@@ -23,6 +23,7 @@ public class RequestService {
     private final RequestCaseFactory requestCaseFactory;
     private final PricingService pricingService;
     private final StatusTransitionService statusTransitionService;
+    private final List<RequestStatusObserver> requestStatusObservers;
 
     @Transactional
     public RequestCase createRequest(CreateRequestCommand command) {
@@ -87,7 +88,10 @@ public class RequestService {
     @Transactional
     public RequestCase changeRequestStatus(Long requestCaseId, RequestStatus nextStatus) {
         RequestCase requestCase = findRequestCase(requestCaseId);
+        RequestStatus oldStatus = requestCase.getStatus();
+
         statusTransitionService.changeStatus(requestCase, nextStatus);
+        notifyStatusObservers(requestCase, oldStatus, nextStatus);
 
         return requestCaseRepository.save(requestCase);
     }
@@ -100,5 +104,11 @@ public class RequestService {
     private RequestCase findRequestCase(Long requestCaseId) {
         return requestCaseRepository.findById(requestCaseId)
                 .orElseThrow(() -> new RequestCaseNotFoundException(requestCaseId));
+    }
+
+    private void notifyStatusObservers(RequestCase requestCase, RequestStatus oldStatus, RequestStatus newStatus) {
+        for (RequestStatusObserver observer : requestStatusObservers) {
+            observer.onStatusChanged(requestCase, oldStatus, newStatus);
+        }
     }
 }
