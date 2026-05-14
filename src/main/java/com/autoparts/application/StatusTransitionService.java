@@ -40,4 +40,16 @@ public class StatusTransitionService {
         RequestState currentState = states.get(currentStatus);
         return currentState != null && currentState.canMoveTo(nextStatus);
     }
+
+    public List<RequestStatus> getAllowedNextStatuses(RequestStatus currentStatus) {
+        RequestState currentState = states.get(currentStatus);
+
+        if (currentState == null) {
+            return List.of();
+        }
+
+        return currentState.getAllowedNextStatuses().stream()
+                .sorted()
+                .toList();
+    }
 }

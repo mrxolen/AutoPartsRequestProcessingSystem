@@ -8,6 +8,8 @@ import com.autoparts.domain.SupplierOffer;
 import com.autoparts.infrastructure.CustomerRepository;
 import com.autoparts.infrastructure.RequestCaseRepository;
 import com.autoparts.infrastructure.VehicleRepository;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,55 @@ public class RequestService {
     @Transactional(readOnly = true)
     public RequestCase getRequestById(Long requestCaseId) {
         return findRequestCase(requestCaseId);
+    }
+
+    @Transactional(readOnly = true)
+    public List<RequestStatus> getAvailableNextStatuses(Long requestCaseId) {
+        RequestCase requestCase = findRequestCase(requestCaseId);
+
+        return statusTransitionService.getAllowedNextStatuses(requestCase.getStatus());
+    }
+
+    @Transactional(readOnly = true)
+    public String generateCustomerOfferMessage(Long requestCaseId) {
+        RequestCase requestCase = findRequestCase(requestCaseId);
+
+        if (requestCase.getSupplierOffers().isEmpty()) {
+            return "No supplier offers have been added yet.";
+        }
+
+        StringBuilder message = new StringBuilder();
+        message.append("Dear ").append(requestCase.getCustomer().getName()).append(",\n\n");
+        message.append("We have prepared an offer for your ")
+                .append(requestCase.getVehicle().getBrand()).append(" ")
+                .append(requestCase.getVehicle().getModel()).append(".\n\n");
+
+        BigDecimal totalSellingPrice = BigDecimal.ZERO;
+        String currency = requestCase.getSupplierOffers().getFirst().getSellingPrice().getCurrency();
+
+        for (SupplierOffer supplierOffer : requestCase.getSupplierOffers()) {
+            BigDecimal lineTotal = supplierOffer.getSellingPrice().getAmount()
+                    .multiply(BigDecimal.valueOf(supplierOffer.getQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP);
+            totalSellingPrice = totalSellingPrice.add(lineTotal);
+
+            message.append("- ")
+                    .append(supplierOffer.getQuantity()).append(" x ")
+                    .append(supplierOffer.getBrandName()).append(" ")
+                    .append(supplierOffer.getPartName()).append(" (")
+                    .append(supplierOffer.getPartCode()).append("): ")
+                    .append(lineTotal).append(" ")
+                    .append(supplierOffer.getSellingPrice().getCurrency())
+                    .append("\n");
+        }
+
+        message.append("\nTotal selling price: ")
+                .append(totalSellingPrice.setScale(2, RoundingMode.HALF_UP))
+                .append(" ")
+                .append(currency)
+                .append("\n\nPlease contact us if you want to accept this offer.");
+
+        return message.toString();
     }
 
     @Transactional

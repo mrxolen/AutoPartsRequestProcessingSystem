@@ -151,6 +151,27 @@ Each history entry stores:
 
 This keeps status change side effects separate from the transition validation logic.
 
+## Web UI
+
+The first Thymeleaf UI is available through `RequestController`.
+
+Current pages:
+
+- request list: `/requests`
+- create request: `/requests/new`
+- request details: `/requests/{id}`
+- add requested part: `/requests/{id}/parts/new`
+- add supplier offer: `/requests/{id}/offers/new`
+
+The request details page also includes:
+
+- status change actions based on the current workflow state
+- requested parts and supplier offers
+- status history
+- generated customer offer message
+
+Controllers stay thin and delegate business work to `RequestService`. Form validation is added for required fields and numeric values. Shared labels are stored in `messages.properties`, and styling is kept in `static/css/styles.css`.
+
 ## Start PostgreSQL
 
 Start the PostgreSQL container:
@@ -164,4 +185,13 @@ Database settings:
 - Database: `autoparts_db`
 - User: `autoparts_user`
 - Password: `12345`
-- Port: `5432`
+- Port: `5433`
+
+## PostgreSQL Troubleshooting
+
+If the Docker volume was created with old credentials, recreate it:
+
+```bash
+docker compose down -v
+docker compose up -d
+```

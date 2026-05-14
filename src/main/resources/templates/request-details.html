@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<header th:replace="~{layout :: header}"></header>
+<div th:replace="~{layout :: flash}"></div>
+
+<main class="container page">
+    <div class="page-heading">
+        <div>
+            <h1 th:text="#{page.requestDetails.title}">Request Details</h1>
+            <p>
+                Request <span th:text="${requestCase.id}">1</span>
+                is currently <span class="status" th:text="${requestCase.status}">NEW</span>
+            </p>
+        </div>
+        <a class="button button-secondary" th:href="@{/requests}" th:text="#{action.backToRequests}">Back to Requests</a>
+    </div>
+
+    <div class="details-grid">
+        <section class="panel">
+            <h2 th:text="#{section.customer}">Customer</h2>
+            <dl class="details-list">
+                <dt th:text="#{label.customer.name}">Customer Name</dt>
+                <dd th:text="${requestCase.customer.name}">Customer</dd>
+                <dt th:text="#{label.customer.type}">Customer Type</dt>
+                <dd th:text="${requestCase.customer.type}">WALK_IN</dd>
+                <dt th:text="#{label.customer.phone}">Phone Number</dt>
+                <dd th:text="${requestCase.customer.phoneNumber ?: '-'}">-</dd>
+                <dt th:text="#{label.customer.email}">Email</dt>
+                <dd th:text="${requestCase.customer.email ?: '-'}">-</dd>
+            </dl>
+        </section>
+
+        <section class="panel">
+            <h2 th:text="#{section.vehicle}">Vehicle</h2>
+            <dl class="details-list">
+                <dt th:text="#{label.vehicle.brand}">Vehicle Brand</dt>
+                <dd th:text="${requestCase.vehicle.brand}">SEAT</dd>
+                <dt th:text="#{label.vehicle.model}">Vehicle Model</dt>
+                <dd th:text="${requestCase.vehicle.model}">ALHAMBRA</dd>
+                <dt th:text="#{label.vehicle.year}">Production Year</dt>
+                <dd th:text="${requestCase.vehicle.productionYear ?: '-'}">2007</dd>
+                <dt th:text="#{label.vehicle.vin}">VIN</dt>
+                <dd th:text="${requestCase.vehicle.vin ?: '-'}">VIN</dd>
+            </dl>
+        </section>
+    </div>
+
+    <section class="panel">
+        <div class="section-heading">
+            <h2 th:text="#{section.requestedParts}">Requested Parts</h2>
+            <a class="button button-secondary" th:href="@{/requests/{id}/parts/new(id=${requestCase.id})}" th:text="#{action.addRequestedPart}">Add Requested Part</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th th:text="#{label.part.name}">Part Name</th>
+                    <th th:text="#{label.part.note}">Description or Note</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(requestCase.requestedParts)}">
+                    <td colspan="2" class="empty" th:text="#{empty.requestedParts}">No requested parts have been added yet.</td>
+                </tr>
+                <tr th:each="part : ${requestCase.requestedParts}">
+                    <td th:text="${part.partName}">Part</td>
+                    <td th:text="${part.note ?: '-'}">Note</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <div class="section-heading">
+            <h2 th:text="#{section.supplierOffers}">Supplier Offers</h2>
+            <a class="button button-secondary" th:href="@{/requests/{id}/offers/new(id=${requestCase.id})}" th:text="#{action.addSupplierOffer}">Add Supplier Offer</a>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th th:text="#{label.part.code}">Part Code</th>
+                    <th th:text="#{label.part.name}">Part Name</th>
+                    <th th:text="#{label.quantity}">Quantity</th>
+                    <th th:text="#{label.purchasePrice}">Purchase Price</th>
+                    <th th:text="#{label.sellingPrice}">Selling Price</th>
+                    <th th:text="#{label.supplier.name}">Supplier Name</th>
+                    <th th:text="#{label.brand.name}">Brand Name</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(requestCase.supplierOffers)}">
+                    <td colspan="7" class="empty" th:text="#{empty.supplierOffers}">No supplier offers have been added yet.</td>
+                </tr>
+                <tr th:each="offer : ${requestCase.supplierOffers}">
+                    <td th:text="${offer.partCode}">Code</td>
+                    <td th:text="${offer.partName}">Part</td>
+                    <td th:text="${offer.quantity}">1</td>
+                    <td th:text="${offer.purchasePrice.amount + ' ' + offer.purchasePrice.currency}">0.00 EUR</td>
+                    <td th:text="${offer.sellingPrice.amount + ' ' + offer.sellingPrice.currency}">0.00 EUR</td>
+                    <td th:text="${offer.supplierName}">Supplier</td>
+                    <td th:text="${offer.brandName}">Brand</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2 th:text="#{section.statusActions}">Change Request Status</h2>
+        <div class="status-actions" th:if="${!#lists.isEmpty(nextStatuses)}">
+            <form th:each="nextStatus : ${nextStatuses}" th:action="@{/requests/{id}/status(id=${requestCase.id})}" method="post">
+                <input type="hidden" name="nextStatus" th:value="${nextStatus}">
+                <button class="button button-primary" type="submit" th:text="${nextStatus}">NEXT_STATUS</button>
+            </form>
+        </div>
+        <p class="empty" th:if="${#lists.isEmpty(nextStatuses)}" th:text="#{empty.statusActions}">No further status transitions are available.</p>
+    </section>
+
+    <section class="panel">
+        <h2 th:text="#{section.statusHistory}">Status History</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th th:text="#{label.oldStatus}">Old Status</th>
+                    <th th:text="#{label.newStatus}">New Status</th>
+                    <th th:text="#{label.changedDate}">Change Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(requestCase.statusHistory)}">
+                    <td colspan="3" class="empty" th:text="#{empty.statusHistory}">No status changes recorded yet.</td>
+                </tr>
+                <tr th:each="history : ${requestCase.statusHistory}">
+                    <td th:text="${history.oldStatus}">NEW</td>
+                    <td th:text="${history.newStatus}">SEARCHING</td>
+                    <td th:text="${history.changedDate != null ? #temporals.format(history.changedDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2 th:text="#{section.customerOfferMessage}">Generated Customer Offer Message</h2>
+        <pre class="offer-message" th:text="${customerOfferMessage}">Offer message</pre>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<header th:replace="~{layout :: header}"></header>
+<div th:replace="~{layout :: flash}"></div>
+
+<main class="container page">
+    <div class="page-heading">
+        <div>
+            <h1 th:text="#{page.requests.title}">Request List</h1>
+            <p>Track customer requests, supplier offers, and current workflow status.</p>
+        </div>
+        <a class="button button-primary" th:href="@{/requests/new}" th:text="#{action.createRequest}">Create Request</a>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th th:text="#{label.id}">ID</th>
+                <th th:text="#{label.customer}">Customer</th>
+                <th th:text="#{label.customer.type}">Customer Type</th>
+                <th th:text="#{label.vehicle}">Vehicle</th>
+                <th th:text="#{label.status}">Status</th>
+                <th th:text="#{label.createdDate}">Created Date</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td colspan="7" class="empty" th:text="#{empty.requests}">No requests found.</td>
+            </tr>
+            <tr th:each="requestCase : ${requests}">
+                <td th:text="${requestCase.id}">1</td>
+                <td th:text="${requestCase.customer.name}">Customer</td>
+                <td th:text="${requestCase.customer.type}">WALK_IN</td>
+                <td th:text="${requestCase.vehicle.brand + ' ' + requestCase.vehicle.model}">Vehicle</td>
+                <td><span class="status" th:text="${requestCase.status}">NEW</span></td>
+                <td th:text="${requestCase.createdDate != null ? #temporals.format(requestCase.createdDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                <td class="table-actions">
+                    <a class="button button-secondary" th:href="@{/requests/{id}(id=${requestCase.id})}" th:text="#{action.details}">Details</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

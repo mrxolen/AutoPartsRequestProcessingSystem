@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="#{app.name}">Auto Parts Request Processing System</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+<header class="app-header" th:fragment="header">
+    <div class="container header-content">
+        <a class="brand" th:href="@{/requests}" th:text="#{app.name}">Auto Parts Request Processing System</a>
+        <nav class="main-nav">
+            <a th:href="@{/requests}" th:text="#{nav.requests}">Requests</a>
+            <a th:href="@{/requests/new}" th:text="#{nav.createRequest}">Create Request</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container flash-list" th:fragment="flash">
+    <div class="flash flash-success" th:if="${successMessage}" th:text="${successMessage}">Success</div>
+    <div class="flash flash-error" th:if="${errorMessage}" th:text="${errorMessage}">Error</div>
+</div>
+</body>
+</html>

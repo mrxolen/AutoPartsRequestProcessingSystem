@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<header th:replace="~{layout :: header}"></header>
+
+<main class="container page narrow-page">
+    <div class="page-heading">
+        <div>
+            <h1 th:text="#{page.createRequest.title}">Create Request</h1>
+            <p>Enter customer and vehicle information for a new request.</p>
+        </div>
+    </div>
+
+    <form class="form" th:action="@{/requests}" th:object="${createRequestForm}" method="post">
+        <fieldset>
+            <legend th:text="#{section.customer}">Customer</legend>
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="customerName" th:text="#{label.customer.name}">Customer Name</label>
+                    <input id="customerName" type="text" th:field="*{customerName}">
+                    <p class="field-error" th:if="${#fields.hasErrors('customerName')}" th:errors="*{customerName}">Error</p>
+                </div>
+
+                <div class="form-field">
+                    <label for="customerType" th:text="#{label.customer.type}">Customer Type</label>
+                    <select id="customerType" th:field="*{customerType}">
+                        <option th:each="type : ${customerTypes}" th:value="${type}" th:text="${type}">WALK_IN</option>
+                    </select>
+                    <p class="field-error" th:if="${#fields.hasErrors('customerType')}" th:errors="*{customerType}">Error</p>
+                </div>
+
+                <div class="form-field">
+                    <label for="phoneNumber" th:text="#{label.customer.phone}">Phone Number</label>
+                    <input id="phoneNumber" type="text" th:field="*{phoneNumber}">
+                </div>
+
+                <div class="form-field">
+                    <label for="email" th:text="#{label.customer.email}">Email</label>
+                    <input id="email" type="email" th:field="*{email}">
+                    <p class="field-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Error</p>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend th:text="#{section.vehicle}">Vehicle</legend>
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="vehicleBrand" th:text="#{label.vehicle.brand}">Vehicle Brand</label>
+                    <input id="vehicleBrand" type="text" th:field="*{vehicleBrand}">
+                    <p class="field-error" th:if="${#fields.hasErrors('vehicleBrand')}" th:errors="*{vehicleBrand}">Error</p>
+                </div>
+
+                <div class="form-field">
+                    <label for="vehicleModel" th:text="#{label.vehicle.model}">Vehicle Model</label>
+                    <input id="vehicleModel" type="text" th:field="*{vehicleModel}">
+                    <p class="field-error" th:if="${#fields.hasErrors('vehicleModel')}" th:errors="*{vehicleModel}">Error</p>
+                </div>
+
+                <div class="form-field">
+                    <label for="vehicleProductionYear" th:text="#{label.vehicle.year}">Production Year</label>
+                    <input id="vehicleProductionYear" type="number" th:field="*{vehicleProductionYear}">
+                    <p class="field-error" th:if="${#fields.hasErrors('vehicleProductionYear')}" th:errors="*{vehicleProductionYear}">Error</p>
+                </div>
+
+                <div class="form-field">
+                    <label for="vin" th:text="#{label.vehicle.vin}">VIN</label>
+                    <input id="vin" type="text" th:field="*{vin}">
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="form-actions">
+            <a class="button button-secondary" th:href="@{/requests}" th:text="#{action.cancel}">Cancel</a>
+            <button class="button button-primary" type="submit" th:text="#{action.createRequest}">Create Request</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

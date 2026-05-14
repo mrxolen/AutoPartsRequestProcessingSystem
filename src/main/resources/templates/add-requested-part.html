@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<header th:replace="~{layout :: header}"></header>
+
+<main class="container page narrow-page">
+    <div class="page-heading">
+        <div>
+            <h1 th:text="#{page.addRequestedPart.title}">Add Requested Part</h1>
+            <p>Request <span th:text="${requestCase.id}">1</span></p>
+        </div>
+    </div>
+
+    <form class="form" th:action="@{/requests/{id}/parts(id=${requestCase.id})}" th:object="${addRequestedPartForm}" method="post">
+        <div class="form-field">
+            <label for="partName" th:text="#{label.part.name}">Part Name</label>
+            <input id="partName" type="text" th:field="*{partName}">
+            <p class="field-error" th:if="${#fields.hasErrors('partName')}" th:errors="*{partName}">Error</p>
+        </div>
+
+        <div class="form-field">
+            <label for="note" th:text="#{label.part.note}">Description or Note</label>
+            <textarea id="note" rows="4" th:field="*{note}"></textarea>
+            <p class="field-error" th:if="${#fields.hasErrors('note')}" th:errors="*{note}">Error</p>
+        </div>
+
+        <div class="form-actions">
+            <a class="button button-secondary" th:href="@{/requests/{id}(id=${requestCase.id})}" th:text="#{action.cancel}">Cancel</a>
+            <button class="button button-primary" type="submit" th:text="#{action.save}">Save</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>
