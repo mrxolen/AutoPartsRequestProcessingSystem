@@ -179,10 +179,23 @@ Controllers stay thin and delegate business work to `RequestService`. Form valid
 The generated message includes:
 
 - vehicle information and VIN
-- supplier offer lines with part name, code, brand, quantity, and selling price
-- total selling price
+- grouped supplier offer positions with part name and part code
+- alternative brand options for the same part
+- one total when all positions have one price, or a price range when alternatives exist
 
 The request details page displays this message in a copyable text block.
+
+## Request Management Features
+
+The request list can now be sorted by vehicle number, customer name, or created date, and filtered by request status.
+
+Requests can also be:
+
+- edited after creation
+- deleted from the request details page
+- updated together with their requested parts and supplier offers
+
+Supplier offers with the same part code and part name are treated as alternative manufacturer or brand options for one required part. These alternatives are not summed together, and the customer report shows a price range when more than one option is available.
 
 ## Start PostgreSQL
 

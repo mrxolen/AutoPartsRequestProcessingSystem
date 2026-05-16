@@ -11,6 +11,8 @@
     --success-text: #205b33;
     --error-bg: #fdeceb;
     --error-text: #9b2c2c;
+    --danger: #b33a3a;
+    --danger-dark: #8f2e2e;
 }
 
 * {
@@ -81,6 +83,14 @@ a:hover {
     justify-content: space-between;
     gap: 18px;
     margin-bottom: 18px;
+}
+
+.toolbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
 h1,
@@ -210,11 +220,32 @@ th {
     color: var(--text);
 }
 
+.button-danger {
+    background: var(--danger);
+    color: #ffffff;
+}
+
+.button-danger:hover {
+    background: var(--danger-dark);
+}
+
 .form {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 20px;
+}
+
+.filter-form {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+}
+
+.filter-form .form-field {
+    min-width: 220px;
 }
 
 fieldset {
@@ -273,6 +304,25 @@ textarea {
     margin: 0;
     color: var(--error-text);
     font-size: 13px;
+}
+
+.section-note {
+    margin: 0 0 14px;
+}
+
+.offer-group + .offer-group {
+    margin-top: 18px;
+}
+
+.offer-group-title {
+    margin: 0 0 10px;
+    font-size: 16px;
+}
+
+.offer-group-code {
+    margin-left: 8px;
+    color: var(--muted);
+    font-weight: 400;
 }
 
 .form-actions,
@@ -334,7 +384,9 @@ textarea {
 
     .main-nav,
     .form-actions,
-    .status-actions {
+    .status-actions,
+    .toolbar-actions,
+    .filter-form {
         align-items: stretch;
         flex-direction: column;
     }

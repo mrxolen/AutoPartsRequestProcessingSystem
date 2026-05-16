@@ -23,7 +23,8 @@ class RequestCaseFactoryTest {
                 "SEAT",
                 "ALHAMBRA",
                 2007,
-                "VSSZZZ7MZ8V505695"
+                "VSSZZZ7MZ8V505695",
+                "LV-1234"
         );
 
         RequestCase requestCase = requestCaseFactory.create(command);
@@ -35,5 +36,6 @@ class RequestCaseFactoryTest {
         assertThat(requestCase.getVehicle().getModel()).isEqualTo("ALHAMBRA");
         assertThat(requestCase.getVehicle().getProductionYear()).isEqualTo(2007);
         assertThat(requestCase.getVehicle().getVin()).isEqualTo("VSSZZZ7MZ8V505695");
+        assertThat(requestCase.getVehicle().getLicensePlate()).isEqualTo("LV-1234");
     }
 }

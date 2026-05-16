@@ -14,7 +14,13 @@
                 is currently <span class="status" th:text="${requestCase.status}">NEW</span>
             </p>
         </div>
-        <a class="button button-secondary" th:href="@{/requests}" th:text="#{action.backToRequests}">Back to Requests</a>
+        <div class="toolbar-actions">
+            <a class="button button-secondary" th:href="@{/requests}" th:text="#{action.backToRequests}">Back to Requests</a>
+            <a class="button button-secondary" th:href="@{/requests/{id}/edit(id=${requestCase.id})}" th:text="#{action.editRequest}">Edit Request</a>
+            <form th:action="@{/requests/{id}/delete(id=${requestCase.id})}" method="post" onsubmit="return confirm('Delete this request?');">
+                <button class="button button-danger" type="submit" th:text="#{action.deleteRequest}">Delete Request</button>
+            </form>
+        </div>
     </div>
 
     <div class="details-grid">
@@ -43,6 +49,8 @@
                 <dd th:text="${requestCase.vehicle.productionYear ?: '-'}">2007</dd>
                 <dt th:text="#{label.vehicle.vin}">VIN</dt>
                 <dd th:text="${requestCase.vehicle.vin ?: '-'}">VIN</dd>
+                <dt th:text="#{label.vehicle.licensePlate}">License Plate</dt>
+                <dd th:text="${requestCase.vehicle.licensePlate ?: '-'}">Plate</dd>
             </dl>
         </section>
     </div>
@@ -58,15 +66,19 @@
                 <tr>
                     <th th:text="#{label.part.name}">Part Name</th>
                     <th th:text="#{label.part.note}">Description or Note</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:if="${#lists.isEmpty(requestCase.requestedParts)}">
-                    <td colspan="2" class="empty" th:text="#{empty.requestedParts}">No requested parts have been added yet.</td>
+                    <td colspan="3" class="empty" th:text="#{empty.requestedParts}">No requested parts have been added yet.</td>
                 </tr>
                 <tr th:each="part : ${requestCase.requestedParts}">
                     <td th:text="${part.partName}">Part</td>
                     <td th:text="${part.note ?: '-'}">Note</td>
+                    <td class="table-actions">
+                        <a class="button button-secondary" th:href="@{/requests/{id}/requested-parts/{partId}/edit(id=${requestCase.id},partId=${part.id})}" th:text="#{action.edit}">Edit</a>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -78,34 +90,39 @@
             <h2 th:text="#{section.supplierOffers}">Supplier Offers</h2>
             <a class="button button-secondary" th:href="@{/requests/{id}/offers/new(id=${requestCase.id})}" th:text="#{action.addSupplierOffer}">Add Supplier Offer</a>
         </div>
-        <div class="table-wrap">
-            <table>
-                <thead>
-                <tr>
-                    <th th:text="#{label.part.code}">Part Code</th>
-                    <th th:text="#{label.part.name}">Part Name</th>
-                    <th th:text="#{label.quantity}">Quantity</th>
-                    <th th:text="#{label.purchasePrice}">Purchase Price</th>
-                    <th th:text="#{label.sellingPrice}">Selling Price</th>
-                    <th th:text="#{label.supplier.name}">Supplier Name</th>
-                    <th th:text="#{label.brand.name}">Brand Name</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(requestCase.supplierOffers)}">
-                    <td colspan="7" class="empty" th:text="#{empty.supplierOffers}">No supplier offers have been added yet.</td>
-                </tr>
-                <tr th:each="offer : ${requestCase.supplierOffers}">
-                    <td th:text="${offer.partCode}">Code</td>
-                    <td th:text="${offer.partName}">Part</td>
-                    <td th:text="${offer.quantity}">1</td>
-                    <td th:text="${offer.purchasePrice.amount + ' ' + offer.purchasePrice.currency}">0.00 EUR</td>
-                    <td th:text="${offer.sellingPrice.amount + ' ' + offer.sellingPrice.currency}">0.00 EUR</td>
-                    <td th:text="${offer.supplierName}">Supplier</td>
-                    <td th:text="${offer.brandName}">Brand</td>
-                </tr>
-                </tbody>
-            </table>
+        <p class="section-note" th:text="#{note.multipleOffers}">Offers with the same part code and part name are alternative brand options and are not added together in the customer report.</p>
+        <p class="empty" th:if="${#lists.isEmpty(supplierOfferGroups)}" th:text="#{empty.supplierOffers}">No supplier offers have been added yet.</p>
+        <div class="offer-group" th:each="group : ${supplierOfferGroups}">
+            <h3 class="offer-group-title">
+                <span th:text="${group.partName}">Part</span>
+                <span class="offer-group-code" th:text="${group.partCode}">Code</span>
+            </h3>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th th:text="#{label.quantity}">Quantity</th>
+                        <th th:text="#{label.purchasePrice}">Purchase Price</th>
+                        <th th:text="#{label.sellingPrice}">Selling Price</th>
+                        <th th:text="#{label.supplier.name}">Supplier Name</th>
+                        <th th:text="#{label.brand.name}">Brand Name</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="offer : ${group.offers}">
+                        <td th:text="${offer.quantity}">1</td>
+                        <td th:text="${offer.purchasePrice.amount + ' ' + offer.purchasePrice.currency}">0.00 EUR</td>
+                        <td th:text="${offer.sellingPrice.amount + ' ' + offer.sellingPrice.currency}">0.00 EUR</td>
+                        <td th:text="${offer.supplierName}">Supplier</td>
+                        <td th:text="${offer.brandName}">Brand</td>
+                        <td class="table-actions">
+                            <a class="button button-secondary" th:href="@{/requests/{id}/supplier-offers/{offerId}/edit(id=${requestCase.id},offerId=${offer.id})}" th:text="#{action.edit}">Edit</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 

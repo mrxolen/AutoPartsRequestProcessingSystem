@@ -24,6 +24,8 @@ public class Vehicle {
 
     private String vin;
 
+    private String licensePlate;
+
     private String brand;
 
     private String model;

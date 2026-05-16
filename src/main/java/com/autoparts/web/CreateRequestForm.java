@@ -37,6 +37,8 @@ public class CreateRequestForm {
 
     private String vin;
 
+    private String licensePlate;
+
     public CreateRequestCommand toCommand() {
         return new CreateRequestCommand(
                 customerName,
@@ -46,7 +48,8 @@ public class CreateRequestForm {
                 vehicleBrand,
                 vehicleModel,
                 vehicleProductionYear,
-                vin
+                vin,
+                licensePlate
         );
     }
 }

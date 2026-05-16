@@ -14,6 +14,33 @@
         <a class="button button-primary" th:href="@{/requests/new}" th:text="#{action.createRequest}">Create Request</a>
     </div>
 
+    <section class="panel">
+        <h2 th:text="#{section.requestListControls}">Sort and Filter</h2>
+        <form class="filter-form" th:action="@{/requests}" method="get">
+            <div class="form-field">
+                <label for="sort" th:text="#{sort.label}">Sort By</label>
+                <select id="sort" name="sort">
+                    <option value="vehicleNumber" th:selected="${selectedSort == 'vehicleNumber'}" th:text="#{sort.vehicleNumber}">Vehicle Number</option>
+                    <option value="customerName" th:selected="${selectedSort == 'customerName'}" th:text="#{sort.customerName}">Customer Name</option>
+                    <option value="createdDate" th:selected="${selectedSort == 'createdDate'}" th:text="#{sort.createdDate}">Created Date</option>
+                </select>
+            </div>
+
+            <div class="form-field">
+                <label for="status" th:text="#{filter.status}">Status</label>
+                <select id="status" name="status">
+                    <option value="ALL" th:selected="${selectedStatus == 'ALL'}">ALL</option>
+                    <option th:each="requestStatus : ${requestStatuses}"
+                            th:value="${requestStatus}"
+                            th:selected="${selectedStatus == requestStatus.name()}"
+                            th:text="${requestStatus}">NEW</option>
+                </select>
+            </div>
+
+            <button class="button button-primary" type="submit" th:text="#{action.apply}">Apply</button>
+        </form>
+    </section>
+
     <div class="table-wrap">
         <table>
             <thead>
@@ -22,6 +49,7 @@
                 <th th:text="#{label.customer}">Customer</th>
                 <th th:text="#{label.customer.type}">Customer Type</th>
                 <th th:text="#{label.vehicle}">Vehicle</th>
+                <th th:text="#{label.vehicle.number}">Vehicle Number</th>
                 <th th:text="#{label.status}">Status</th>
                 <th th:text="#{label.createdDate}">Created Date</th>
                 <th></th>
@@ -29,13 +57,14 @@
             </thead>
             <tbody>
             <tr th:if="${#lists.isEmpty(requests)}">
-                <td colspan="7" class="empty" th:text="#{empty.requests}">No requests found.</td>
+                <td colspan="8" class="empty" th:text="#{empty.requests}">No requests found.</td>
             </tr>
             <tr th:each="requestCase : ${requests}">
                 <td th:text="${requestCase.id}">1</td>
                 <td th:text="${requestCase.customer.name}">Customer</td>
                 <td th:text="${requestCase.customer.type}">WALK_IN</td>
                 <td th:text="${requestCase.vehicle.brand + ' ' + requestCase.vehicle.model}">Vehicle</td>
+                <td th:text="${#strings.isEmpty(requestCase.vehicle.licensePlate) ? (requestCase.vehicle.vin ?: '-') : requestCase.vehicle.licensePlate}">Vehicle Number</td>
                 <td><span class="status" th:text="${requestCase.status}">NEW</span></td>
                 <td th:text="${requestCase.createdDate != null ? #temporals.format(requestCase.createdDate, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
                 <td class="table-actions">

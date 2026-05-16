@@ -35,6 +35,7 @@ public class RequestCaseFactory {
         vehicle.setModel(command.vehicleModel());
         vehicle.setProductionYear(command.vehicleProductionYear());
         vehicle.setVin(command.vin());
+        vehicle.setLicensePlate(command.licensePlate());
 
         RequestCase requestCase = new RequestCase();
         requestCase.setCustomer(customer);

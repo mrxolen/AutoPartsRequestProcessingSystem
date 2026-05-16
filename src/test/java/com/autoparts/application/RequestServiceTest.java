@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import com.autoparts.application.command.AddRequestedPartCommand;
 import com.autoparts.application.command.AddSupplierOfferCommand;
 import com.autoparts.application.command.CreateRequestCommand;
+import com.autoparts.application.command.UpdateSupplierOfferCommand;
 import com.autoparts.application.exception.RequestCaseNotFoundException;
 import com.autoparts.application.factory.RequestCaseFactory;
 import com.autoparts.application.observer.RequestStatusObserver;
@@ -39,6 +40,7 @@ import com.autoparts.infrastructure.CustomerRepository;
 import com.autoparts.infrastructure.RequestCaseRepository;
 import com.autoparts.infrastructure.VehicleRepository;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,13 +102,15 @@ class RequestServiceTest {
                 "SEAT",
                 "ALHAMBRA",
                 2007,
-                "VSSZZZ7MZ8V505695"
+                "VSSZZZ7MZ8V505695",
+                "LV-1234"
         );
 
         RequestCase requestCase = requestService.createRequest(command);
 
         assertThat(requestCase.getCustomer().getType()).isEqualTo(CustomerType.REGULAR);
         assertThat(requestCase.getStatus()).isEqualTo(RequestStatus.NEW);
+        assertThat(requestCase.getVehicle().getLicensePlate()).isEqualTo("LV-1234");
         verify(customerRepository).save(requestCase.getCustomer());
         verify(vehicleRepository).save(requestCase.getVehicle());
         verify(requestCaseRepository).save(requestCase);
@@ -174,6 +178,76 @@ class RequestServiceTest {
     }
 
     @Test
+    void filtersByStatusAndSortsByCustomerName() {
+        RequestCase second = requestCaseForList("Zane", RequestStatus.SEARCHING, "LV-2000", "VIN-2000");
+        RequestCase first = requestCaseForList("Anna", RequestStatus.SEARCHING, "LV-1000", "VIN-1000");
+        RequestCase excluded = requestCaseForList("Bob", RequestStatus.NEW, "LV-3000", "VIN-3000");
+        when(requestCaseRepository.findAll()).thenReturn(List.of(second, first, excluded));
+
+        List<RequestCase> requests = requestService.getRequests("customerName", "SEARCHING");
+
+        assertThat(requests).containsExactly(first, second);
+    }
+
+    @Test
+    void sortsByVehicleNumberAndFallsBackToVin() {
+        RequestCase vinOnly = requestCaseForList("Anna", RequestStatus.NEW, null, "AAA-001");
+        RequestCase plate = requestCaseForList("Bob", RequestStatus.NEW, "BBB-002", "ZZZ-999");
+        when(requestCaseRepository.findAll()).thenReturn(List.of(plate, vinOnly));
+
+        List<RequestCase> requests = requestService.getRequests("vehicleNumber", "ALL");
+
+        assertThat(requests).containsExactly(vinOnly, plate);
+    }
+
+    @Test
+    void updatesSupplierOfferAndRecalculatesSellingPrice() {
+        RequestCase requestCase = requestCaseWithCustomerType(CustomerType.REGULAR);
+        SupplierOffer supplierOffer = new SupplierOffer();
+        supplierOffer.setId(10L);
+        supplierOffer.setPartCode("BD-100");
+        supplierOffer.setPartName("front brake discs");
+        supplierOffer.setQuantity(1);
+        supplierOffer.setPurchasePrice(new com.autoparts.domain.Money(new BigDecimal("100.00"), "EUR"));
+        supplierOffer.setSellingPrice(new com.autoparts.domain.Money(new BigDecimal("125.00"), "EUR"));
+        supplierOffer.setSupplierName("Auto Supplier");
+        supplierOffer.setBrandName("Brembo");
+        supplierOffer.setRequestCase(requestCase);
+        requestCase.getSupplierOffers().add(supplierOffer);
+        when(requestCaseRepository.findById(1L)).thenReturn(Optional.of(requestCase));
+
+        RequestCase savedRequest = requestService.updateSupplierOffer(
+                1L,
+                10L,
+                new UpdateSupplierOfferCommand(
+                        "BP-200",
+                        "front brake pads",
+                        2,
+                        new BigDecimal("40.00"),
+                        "Second Supplier",
+                        "ATE"
+                )
+        );
+
+        SupplierOffer updatedOffer = savedRequest.getSupplierOffers().getFirst();
+        assertThat(updatedOffer.getPartCode()).isEqualTo("BP-200");
+        assertThat(updatedOffer.getQuantity()).isEqualTo(2);
+        assertThat(updatedOffer.getPurchasePrice().getAmount()).isEqualByComparingTo("40.00");
+        assertThat(updatedOffer.getSellingPrice().getAmount()).isEqualByComparingTo("50.00");
+        verify(requestCaseRepository).save(requestCase);
+    }
+
+    @Test
+    void deletesExistingRequest() {
+        RequestCase requestCase = requestCaseWithCustomerType(CustomerType.WALK_IN);
+        when(requestCaseRepository.findById(1L)).thenReturn(Optional.of(requestCase));
+
+        requestService.deleteRequest(1L);
+
+        verify(requestCaseRepository).delete(requestCase);
+    }
+
+    @Test
     void throwsWhenRequestIsNotFound() {
         when(requestCaseRepository.findById(99L)).thenReturn(Optional.empty());
 
@@ -190,6 +264,27 @@ class RequestServiceTest {
         requestCase.setCustomer(customer);
         requestCase.setStatus(RequestStatus.NEW);
 
+        return requestCase;
+    }
+
+    private RequestCase requestCaseForList(
+            String customerName,
+            RequestStatus status,
+            String licensePlate,
+            String vin
+    ) {
+        Customer customer = new Customer();
+        customer.setName(customerName);
+
+        Vehicle vehicle = new Vehicle();
+        vehicle.setLicensePlate(licensePlate);
+        vehicle.setVin(vin);
+
+        RequestCase requestCase = new RequestCase();
+        requestCase.setCustomer(customer);
+        requestCase.setVehicle(vehicle);
+        requestCase.setStatus(status);
+        requestCase.setCreatedDate(LocalDateTime.now());
         return requestCase;
     }
 }

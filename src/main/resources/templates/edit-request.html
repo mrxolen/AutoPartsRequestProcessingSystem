@@ -7,12 +7,12 @@
 <main class="container page narrow-page">
     <div class="page-heading">
         <div>
-            <h1 th:text="#{page.createRequest.title}">Create Request</h1>
-            <p>Enter customer and vehicle information for a new request.</p>
+            <h1 th:text="#{page.editRequest.title}">Edit Request</h1>
+            <p>Request <span th:text="${requestCase.id}">1</span></p>
         </div>
     </div>
 
-    <form class="form" th:action="@{/requests}" th:object="${createRequestForm}" method="post">
+    <form class="form" th:action="@{/requests/{id}/edit(id=${requestCase.id})}" th:object="${editRequestForm}" method="post">
         <fieldset>
             <legend th:text="#{section.customer}">Customer</legend>
 
@@ -79,8 +79,8 @@
         </fieldset>
 
         <div class="form-actions">
-            <a class="button button-secondary" th:href="@{/requests}" th:text="#{action.cancel}">Cancel</a>
-            <button class="button button-primary" type="submit" th:text="#{action.createRequest}">Create Request</button>
+            <a class="button button-secondary" th:href="@{/requests/{id}(id=${requestCase.id})}" th:text="#{action.cancel}">Cancel</a>
+            <button class="button button-primary" type="submit" th:text="#{action.save}">Save</button>
         </div>
     </form>
 </main>

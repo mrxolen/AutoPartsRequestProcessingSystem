@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layout :: head}"></head>
+<body>
+<header th:replace="~{layout :: header}"></header>
+
+<main class="container page narrow-page">
+    <div class="page-heading">
+        <div>
+            <h1 th:text="#{page.editSupplierOffer.title}">Edit Supplier Offer</h1>
+            <p>Request <span th:text="${requestCase.id}">1</span></p>
+        </div>
+    </div>
+
+    <form class="form" th:action="@{/requests/{id}/supplier-offers/{offerId}/edit(id=${requestCase.id},offerId=${supplierOffer.id})}" th:object="${editSupplierOfferForm}" method="post">
+        <div class="form-grid">
+            <div class="form-field">
+                <label for="partCode" th:text="#{label.part.code}">Part Code</label>
+                <input id="partCode" type="text" th:field="*{partCode}">
+                <p class="field-error" th:if="${#fields.hasErrors('partCode')}" th:errors="*{partCode}">Error</p>
+            </div>
+
+            <div class="form-field">
+                <label for="partName" th:text="#{label.part.name}">Part Name</label>
+                <input id="partName" type="text" th:field="*{partName}">
+                <p class="field-error" th:if="${#fields.hasErrors('partName')}" th:errors="*{partName}">Error</p>
+            </div>
+
+            <div class="form-field">
+                <label for="quantity" th:text="#{label.quantity}">Quantity</label>
+                <input id="quantity" type="number" min="1" th:field="*{quantity}">
+                <p class="field-error" th:if="${#fields.hasErrors('quantity')}" th:errors="*{quantity}">Error</p>
+            </div>
+
+            <div class="form-field">
+                <label for="purchasePriceAmount" th:text="#{label.purchasePrice}">Purchase Price</label>
+                <input id="purchasePriceAmount" type="number" min="0.01" step="0.01" th:field="*{purchasePriceAmount}">
+                <p class="field-error" th:if="${#fields.hasErrors('purchasePriceAmount')}" th:errors="*{purchasePriceAmount}">Error</p>
+            </div>
+
+            <div class="form-field">
+                <label for="supplierName" th:text="#{label.supplier.name}">Supplier Name</label>
+                <input id="supplierName" type="text" th:field="*{supplierName}">
+                <p class="field-error" th:if="${#fields.hasErrors('supplierName')}" th:errors="*{supplierName}">Error</p>
+            </div>
+
+            <div class="form-field">
+                <label for="brandName" th:text="#{label.brand.name}">Brand Name</label>
+                <input id="brandName" type="text" th:field="*{brandName}">
+                <p class="field-error" th:if="${#fields.hasErrors('brandName')}" th:errors="*{brandName}">Error</p>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a class="button button-secondary" th:href="@{/requests/{id}(id=${requestCase.id})}" th:text="#{action.cancel}">Cancel</a>
+            <button class="button button-primary" type="submit" th:text="#{action.save}">Save</button>
+        </div>
+    </form>
+</main>
+</body>
+</html>

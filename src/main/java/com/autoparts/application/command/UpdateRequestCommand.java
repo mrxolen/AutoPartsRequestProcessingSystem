@@ -4,7 +4,7 @@ import com.autoparts.domain.CustomerType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record CreateRequestCommand(
+public record UpdateRequestCommand(
         @NotBlank String customerName,
         String phoneNumber,
         String email,
