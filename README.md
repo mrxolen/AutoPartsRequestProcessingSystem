@@ -197,13 +197,28 @@ Requests can also be:
 
 Supplier offers with the same part code and part name are treated as alternative manufacturer or brand options for one required part. These alternatives are not summed together, and the customer report shows a price range when more than one option is available.
 
-## Start PostgreSQL
+## Docker Setup
 
-Start the PostgreSQL container:
+For local IntelliJ development, start only PostgreSQL:
+
+```bash
+docker compose up -d postgres
+```
+
+The local Spring Boot configuration in `application.properties` connects to PostgreSQL on `localhost:5433`.
+
+To run the full application with Docker Compose:
 
 ```bash
 docker compose up -d
 ```
+
+This starts both:
+
+- the Spring Boot application at `http://localhost:8080`
+- PostgreSQL for the application container
+
+The Docker profile reads database connection settings from environment variables and connects to PostgreSQL through the Compose service name `postgres`.
 
 Database settings:
 
