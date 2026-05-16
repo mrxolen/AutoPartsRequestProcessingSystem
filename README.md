@@ -2,7 +2,25 @@
 
 ## Project Idea
 
-This project is a web-based Java application for processing customer requests for auto parts. The MVP will grow step by step and later include request status workflow, supplier offers, pricing calculation, and customer-ready report generation.
+This project is a web-based Java application for processing customer requests for auto parts.
+
+The application currently supports:
+
+- creating customer auto parts requests
+- adding vehicle information
+- adding requested parts
+- adding supplier offers
+- customer-based pricing calculation
+- request status workflow
+- status history
+- generated customer offer messages
+- sorting and filtering requests
+- editing and deleting requests
+- grouped alternative supplier offers with price ranges
+- a Thymeleaf web UI
+- PostgreSQL persistence with Docker support
+
+This is not a trivial CRUD application. In addition to storing data, it includes pricing calculation, workflow validation, observer side effects, grouped supplier offer reporting, and generated customer-ready reports.
 
 ## Technology Stack
 
@@ -19,14 +37,19 @@ This project is a web-based Java application for processing customer requests fo
 
 ## Architecture Plan
 
-The project uses a simple layered package structure:
+The project uses a layered structure with clear responsibilities:
 
-- `domain` - business entities and domain rules
-- `application` - application services and use cases
-- `infrastructure` - database and external integrations
-- `web` - controllers and web layer
-
-UI and additional business workflows will be added in later stages.
+- `domain` - JPA entities, enums, and the core business model
+- `application` - business services and design pattern implementations
+- `application.pricing` - Strategy pattern classes for customer-based pricing
+- `application.state` - State pattern classes for request workflow transitions
+- `application.observer` - Observer pattern classes for status-change reactions
+- `application.service` - orchestration services such as `RequestService`, `PricingService`, and `ReportService`
+- `application.command` - command objects used as service inputs
+- `infrastructure` - Spring Data JPA repositories and sample data loading
+- `web` - controllers and web form classes
+- `resources/templates` - Thymeleaf pages
+- `resources/static` - CSS files
 
 ## Domain Model
 
@@ -59,31 +82,38 @@ A simple development data loader creates one sample request when the database ha
 - VIN: `VSSZZZ7MZ8V505695`
 - Requested parts: `front brake discs`, `front brake pads`, `rear springs`
 
-## Pricing Calculation
+## Design Patterns
 
-Pricing calculation is implemented in the `application` package using the Strategy pattern.
+The project uses three main design patterns: Strategy, State, and Observer.
 
-Each customer type has its own pricing strategy:
+### Strategy Pattern
 
-- `WalkInPricingStrategy` adds a fixed markup of `15.00 EUR` per item
-- `RegularPricingStrategy` adds `25%`
-- `VipPricingStrategy` adds `15%`
+The Strategy pattern is used for customer-based pricing calculation.
 
-`PricingStrategyResolver` chooses the correct strategy for the customer type, and `PricingService` uses it to calculate:
+Main classes and interfaces:
 
-- selling price per item
-- total purchase price
-- total selling price
-- profit
+- `PricingStrategy`
+- `WalkInPricingStrategy`
+- `RegularPricingStrategy`
+- `VipPricingStrategy`
+- `PricingStrategyResolver`
+- `PricingService`
 
-This keeps pricing rules separate and avoids putting all customer type logic into one large conditional block.
+Different customer types have different markup rules:
 
-## Request Status Workflow
+- `WALK_IN` uses a fixed markup
+- `REGULAR` uses a percentage markup
+- `VIP` uses a lower percentage markup
 
-Request status changes are implemented in the `application` package using the State pattern.
+This is not artificial because pricing rules are real business logic in the application. New pricing rules can be added later without rewriting the existing pricing service.
 
-Each request status has its own state class:
+### State Pattern
 
+The State pattern is used for the request status workflow.
+
+Main classes and interfaces:
+
+- `RequestState`
 - `NewState`
 - `SearchingState`
 - `OfferReadyState`
@@ -91,19 +121,28 @@ Each request status has its own state class:
 - `AcceptedState`
 - `RejectedState`
 - `CompletedState`
+- `StatusTransitionService`
 
-Each state defines which statuses can come next. `StatusTransitionService` finds the current state for a `RequestCase` and asks it to apply the transition. Invalid transitions throw `InvalidStatusTransitionException`.
+The application prevents invalid status transitions and models the real request workflow. For example, a request can move from `NEW` to `SEARCHING`, but it cannot jump directly from `NEW` to `COMPLETED`.
 
-Valid transitions:
+This is not artificial because a request cannot move freely between statuses; it must follow valid business steps.
 
-- `NEW` -> `SEARCHING`
-- `SEARCHING` -> `OFFER_READY`
-- `OFFER_READY` -> `SENT_TO_CLIENT`
-- `SENT_TO_CLIENT` -> `ACCEPTED`
-- `SENT_TO_CLIENT` -> `REJECTED`
-- `ACCEPTED` -> `COMPLETED`
+### Observer Pattern
 
-This keeps workflow rules close to each status and avoids one large conditional block.
+The Observer pattern is used after request status changes.
+
+Main classes and interfaces:
+
+- `RequestStatusObserver`
+- `StatusHistoryObserver`
+- `ConsoleNotificationObserver`
+- `RequestService`
+
+When a request status changes, observers can react automatically. In this project, observers record status history and log a simple notification.
+
+This is not artificial because status history tracking is a real requirement for request processing.
+
+These patterns satisfy the assignment requirement of using at least 2-3 design patterns with a clear purpose.
 
 ## Application Service Layer
 
@@ -126,30 +165,7 @@ Small command DTOs are used as input objects:
 
 ## Request Factory
 
-`RequestCaseFactory` uses the Factory pattern to create new `RequestCase` objects. It receives a `CreateRequestCommand`, checks the `CustomerType`, and creates the correct request setup for:
-
-- `WALK_IN`
-- `REGULAR`
-- `VIP`
-
-The factory keeps request construction in one place, while `RequestService` stays focused on coordinating persistence, pricing, and status changes.
-
-## Status Change Observers
-
-Request status changes use a simple Observer pattern.
-
-`RequestService` changes the status through `StatusTransitionService`. After a successful transition, it notifies all `RequestStatusObserver` implementations:
-
-- `StatusHistoryObserver` adds a `StatusHistoryEntry` to the request
-- `ConsoleNotificationObserver` writes a simple log message
-
-Each history entry stores:
-
-- old status
-- new status
-- change date
-
-This keeps status change side effects separate from the transition validation logic.
+`RequestCaseFactory` is a small supporting helper that keeps new `RequestCase` construction in one place. It is not one of the three main required design patterns; it simply lets `RequestService` stay focused on coordinating persistence, pricing, and status changes.
 
 ## Web UI
 
@@ -226,6 +242,22 @@ Database settings:
 - User: `autoparts_user`
 - Password: `12345`
 - Port: `5433`
+
+## Demo Flow
+
+1. Start PostgreSQL with Docker:
+
+   ```bash
+   docker compose up -d postgres
+   ```
+
+2. Run the Spring Boot application.
+3. Open `/requests`.
+4. Create a request.
+5. Add requested parts.
+6. Add supplier offers.
+7. Change the request status through the workflow.
+8. View the generated customer offer message on the request details page.
 
 ## PostgreSQL Troubleshooting
 
