@@ -2,6 +2,12 @@ package com.autoparts.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.autoparts.application.pricing.PricingCalculationResult;
+import com.autoparts.application.pricing.PricingStrategyResolver;
+import com.autoparts.application.pricing.RegularPricingStrategy;
+import com.autoparts.application.pricing.VipPricingStrategy;
+import com.autoparts.application.pricing.WalkInPricingStrategy;
+import com.autoparts.application.service.PricingService;
 import com.autoparts.domain.CustomerType;
 import com.autoparts.domain.Money;
 import java.math.BigDecimal;

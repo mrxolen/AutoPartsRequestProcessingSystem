@@ -2,6 +2,8 @@ package com.autoparts.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.autoparts.application.command.CreateRequestCommand;
+import com.autoparts.application.factory.RequestCaseFactory;
 import com.autoparts.domain.CustomerType;
 import com.autoparts.domain.RequestCase;
 import com.autoparts.domain.RequestStatus;

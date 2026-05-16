@@ -1,4 +1,4 @@
-package com.autoparts.application;
+package com.autoparts.application.command;
 
 import com.autoparts.domain.CustomerType;
 import jakarta.validation.constraints.NotBlank;

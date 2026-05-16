@@ -1,4 +1,4 @@
-package com.autoparts.application;
+package com.autoparts.application.observer;
 
 import com.autoparts.domain.RequestCase;
 import com.autoparts.domain.RequestStatus;

@@ -1,15 +1,15 @@
-package com.autoparts.application;
+package com.autoparts.application.state;
 
 import com.autoparts.domain.RequestStatus;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RejectedState implements RequestState {
+public class CompletedState implements RequestState {
 
     @Override
     public RequestStatus getStatus() {
-        return RequestStatus.REJECTED;
+        return RequestStatus.COMPLETED;
     }
 
     @Override

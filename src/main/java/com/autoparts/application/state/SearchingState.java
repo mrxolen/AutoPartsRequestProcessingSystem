@@ -1,4 +1,4 @@
-package com.autoparts.application;
+package com.autoparts.application.state;
 
 import com.autoparts.domain.RequestStatus;
 import java.util.Set;

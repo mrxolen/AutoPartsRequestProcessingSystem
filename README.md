@@ -172,6 +172,18 @@ The request details page also includes:
 
 Controllers stay thin and delegate business work to `RequestService`. Form validation is added for required fields and numeric values. Shared labels are stored in `messages.properties`, and styling is kept in `static/css/styles.css`.
 
+## Customer Offer Report
+
+`ReportService` generates a customer-ready offer message from `RequestCase` data. It does not access repositories or the database directly.
+
+The generated message includes:
+
+- vehicle information and VIN
+- supplier offer lines with part name, code, brand, quantity, and selling price
+- total selling price
+
+The request details page displays this message in a copyable text block.
+
 ## Start PostgreSQL
 
 Start the PostgreSQL container:

@@ -1,4 +1,4 @@
-package com.autoparts.application;
+package com.autoparts.application.command;
 
 import jakarta.validation.constraints.NotBlank;
 

@@ -1,5 +1,6 @@
-package com.autoparts.application;
+package com.autoparts.application.factory;
 
+import com.autoparts.application.command.CreateRequestCommand;
 import com.autoparts.domain.Customer;
 import com.autoparts.domain.CustomerType;
 import com.autoparts.domain.RequestCase;

@@ -1,8 +1,9 @@
 package com.autoparts.web;
 
-import com.autoparts.application.InvalidStatusTransitionException;
-import com.autoparts.application.RequestCaseNotFoundException;
-import com.autoparts.application.RequestService;
+import com.autoparts.application.exception.RequestCaseNotFoundException;
+import com.autoparts.application.service.ReportService;
+import com.autoparts.application.service.RequestService;
+import com.autoparts.application.state.InvalidStatusTransitionException;
 import com.autoparts.domain.CustomerType;
 import com.autoparts.domain.RequestCase;
 import com.autoparts.domain.RequestStatus;
@@ -24,6 +25,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class RequestController {
 
     private final RequestService requestService;
+    private final ReportService reportService;
 
     @GetMapping("/")
     public String home() {
@@ -63,9 +65,11 @@ public class RequestController {
 
     @GetMapping("/requests/{id}")
     public String requestDetails(@PathVariable Long id, Model model) {
-        model.addAttribute("requestCase", requestService.getRequestById(id));
+        RequestCase requestCase = requestService.getRequestById(id);
+
+        model.addAttribute("requestCase", requestCase);
         model.addAttribute("nextStatuses", requestService.getAvailableNextStatuses(id));
-        model.addAttribute("customerOfferMessage", requestService.generateCustomerOfferMessage(id));
+        model.addAttribute("customerOfferMessage", reportService.generateCustomerOfferMessage(requestCase));
         return "request-details";
     }
 

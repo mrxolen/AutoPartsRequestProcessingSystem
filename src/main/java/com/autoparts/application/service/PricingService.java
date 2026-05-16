@@ -1,5 +1,8 @@
-package com.autoparts.application;
+package com.autoparts.application.service;
 
+import com.autoparts.application.pricing.PricingCalculationResult;
+import com.autoparts.application.pricing.PricingStrategy;
+import com.autoparts.application.pricing.PricingStrategyResolver;
 import com.autoparts.domain.CustomerType;
 import com.autoparts.domain.Money;
 import java.math.BigDecimal;

@@ -1,6 +1,6 @@
 package com.autoparts.web;
 
-import com.autoparts.application.AddRequestedPartCommand;
+import com.autoparts.application.command.AddRequestedPartCommand;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;

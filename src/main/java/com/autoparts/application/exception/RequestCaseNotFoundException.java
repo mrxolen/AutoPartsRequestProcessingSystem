@@ -1,4 +1,4 @@
-package com.autoparts.application;
+package com.autoparts.application.exception;
 
 public class RequestCaseNotFoundException extends RuntimeException {
 

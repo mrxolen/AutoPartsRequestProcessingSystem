@@ -1,6 +1,6 @@
 package com.autoparts.web;
 
-import com.autoparts.application.CreateRequestCommand;
+import com.autoparts.application.command.CreateRequestCommand;
 import com.autoparts.domain.CustomerType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;

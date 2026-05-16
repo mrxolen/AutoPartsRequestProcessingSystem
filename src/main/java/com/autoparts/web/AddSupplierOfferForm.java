@@ -1,6 +1,6 @@
 package com.autoparts.web;
 
-import com.autoparts.application.AddSupplierOfferCommand;
+import com.autoparts.application.command.AddSupplierOfferCommand;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

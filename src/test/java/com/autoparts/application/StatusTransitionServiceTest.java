@@ -3,6 +3,15 @@ package com.autoparts.application;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.autoparts.application.state.AcceptedState;
+import com.autoparts.application.state.CompletedState;
+import com.autoparts.application.state.InvalidStatusTransitionException;
+import com.autoparts.application.state.NewState;
+import com.autoparts.application.state.OfferReadyState;
+import com.autoparts.application.state.RejectedState;
+import com.autoparts.application.state.SearchingState;
+import com.autoparts.application.state.SentToClientState;
+import com.autoparts.application.state.StatusTransitionService;
 import com.autoparts.domain.RequestCase;
 import com.autoparts.domain.RequestStatus;
 import java.util.List;

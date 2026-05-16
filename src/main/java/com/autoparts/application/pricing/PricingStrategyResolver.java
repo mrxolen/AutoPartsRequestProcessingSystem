@@ -1,4 +1,4 @@
-package com.autoparts.application;
+package com.autoparts.application.pricing;
 
 import com.autoparts.domain.CustomerType;
 import java.util.EnumMap;

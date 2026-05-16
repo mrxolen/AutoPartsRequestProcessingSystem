@@ -1,19 +1,19 @@
-package com.autoparts.application;
+package com.autoparts.application.state;
 
 import com.autoparts.domain.RequestStatus;
 import java.util.Set;
 import org.springframework.stereotype.Component;
 
 @Component
-public class OfferReadyState implements RequestState {
+public class NewState implements RequestState {
 
     @Override
     public RequestStatus getStatus() {
-        return RequestStatus.OFFER_READY;
+        return RequestStatus.NEW;
     }
 
     @Override
     public Set<RequestStatus> getAllowedNextStatuses() {
-        return Set.of(RequestStatus.SENT_TO_CLIENT);
+        return Set.of(RequestStatus.SEARCHING);
     }
 }
